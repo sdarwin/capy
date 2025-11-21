@@ -4,37 +4,34 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 #
-# Official repository: https://github.com/cppalliance/rts
+# Official repository: https://github.com/cppalliance/capy
 #
 
-set(EXTRAFILES
-    ../../../url/extra/test_suite/test_main.cpp
-    ../../../url/extra/test_suite/test_suite.cpp
-    ../../../url/extra/test_suite/test_suite.hpp
-    )
+add_subdirectory(../../../url/extra/test_suite test_suite)
 
 file(GLOB_RECURSE PFILES CONFIGURE_DEPENDS *.cpp *.hpp)
 list(APPEND PFILES
     CMakeLists.txt
-    Jamfile
-    )
+    Jamfile)
 
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} PREFIX "" FILES ${PFILES})
-source_group("_extra" FILES ${EXTRAFILES})
-add_executable(boost_rts_tests ${PFILES} ${EXTRAFILES})
-target_include_directories(boost_rts_tests PRIVATE . ../../../url/extra/test_suite)
+
+add_executable(boost_capy_tests ${PFILES})
 target_link_libraries(
-    boost_rts_tests PRIVATE
-    Boost::rts
-    )
+    boost_capy_tests PRIVATE
+    boost_url_test_suite_with_main
+    Boost::capy)
 
-if (TARGET Boost::rts_zlib)
-    target_link_libraries(boost_rts_tests PRIVATE Boost::rts_zlib)
+if (TARGET Boost::capy_zlib)
+    target_link_libraries(boost_capy_tests PRIVATE Boost::capy_zlib)
 endif ()
 
-if (TARGET Boost::rts_brotli)
-    target_link_libraries(boost_rts_tests PRIVATE Boost::rts_brotli)
+if (TARGET Boost::capy_brotli)
+    target_link_libraries(boost_capy_tests PRIVATE Boost::capy_brotli)
 endif ()
 
-add_test(NAME boost_rts_tests COMMAND boost_rts_tests)
-add_dependencies(tests boost_rts_tests)
+# Register individual tests with CTest
+boost_url_test_suite_discover_tests(boost_capy_tests)
+
+# Add the main test target to Boost's test suite
+add_dependencies(tests boost_capy_tests)
